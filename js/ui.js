@@ -26,7 +26,7 @@ window.UI = {
     let t = document.getElementById("toast");
     t.textContent = s;
     t.style.display = "block";
-    setTimeout(() => (t.style.display = "none"), 9000);
+    setTimeout(() => (t.style.display = "none"), 7000);
   },
   photo(w) {
     return w.photo
@@ -60,29 +60,26 @@ window.UI = {
   async image(file) {
     if (!file) return "";
     if (file.size > 25e6)
-      throw Error("Photo trop volumineuse (25 Mo maximum).");
+      throw Error("Photo trop volumineuse : 25 Mo maximum.");
     if (file.type && !/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type))
-      throw Error(
-        "Choisis une photo JPEG, PNG, WebP ou HEIC compatible avec ton navigateur.",
-      );
+      throw Error("Choisis une photo JPEG, PNG, WebP ou HEIC compatible.");
     const url = URL.createObjectURL(file);
     try {
       const img = await new Promise((resolve, reject) => {
-        const i = new Image();
-        i.onload = () => resolve(i);
-        i.onerror = () =>
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () =>
           reject(
             Error(
-              "Cette photo ne peut pas être lue. Prends-la depuis le bouton photo ou choisis un JPEG.",
+              "Photo illisible. Reprends-la avec le bouton photo ou choisis un JPEG.",
             ),
           );
-        i.src = url;
+        image.src = url;
       });
       const canvas = document.createElement("canvas");
       let size = 1200,
-        quality = 0.78,
-        result;
-      for (let pass = 0; pass < 5; pass++) {
+        quality = 0.78;
+      for (let attempt = 0; attempt < 6; attempt++) {
         const ratio = Math.min(1, size / Math.max(img.width, img.height));
         canvas.width = Math.max(1, Math.round(img.width * ratio));
         canvas.height = Math.max(1, Math.round(img.height * ratio));
@@ -90,10 +87,14 @@ window.UI = {
         context.fillStyle = "#fff";
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.drawImage(img, 0, 0, canvas.width, canvas.height);
-        result = canvas.toDataURL("image/jpeg", quality);
-        if (result.length < 780000) return result;
+        const result = canvas.toDataURL("image/jpeg", quality);
+        if (
+          result.startsWith("data:image/jpeg;base64,") &&
+          result.length <= 460000
+        )
+          return result;
         size = Math.round(size * 0.8);
-        quality = Math.max(0.5, quality - 0.08);
+        quality = Math.max(0.48, quality - 0.07);
       }
       throw Error("Impossible de réduire cette photo. Essaie une autre image.");
     } finally {

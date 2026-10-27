@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><meta name="theme-color" content="#1B1B1B" /><title>
+    Ma Cave - Actualiser la version</title
+  ><style>
+    body {
+      background: #1b1b1b;
+      color: #f5f2ea;
+      font: 16px/1.6 system-ui;
+      margin: 0;
+      padding: 30px;
+    }
+    main {
+      max-width: 620px;
+      margin: 10vh auto;
+    }
+    h1 {
+      font: 36px Georgia;
+      color: #cdaa6d;
+    }
+    button,
+    a {
+      color: #f5f2ea;
+      background: #6b1024;
+      border: 1px solid #cdaa6d;
+      border-radius: 8px;
+      padding: 16px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.5;
+    }
+    p {
+      color: #ccc;
+    }
+    #status {
+      padding: 15px;
+      border: 1px solid #554936;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      margin: 20px 0;
+    }
+  </style>
+  <main>
+    <h1>Retrouver Ma Cave Mobile</h1>
+    <p>
+      Ce bouton charge la version locale V1.2.1 et remplace l’ancien cache de
+      l’application. Il ne supprime ni les vins, ni les photos enregistrés sur
+      cet appareil.
+    </p>
+    <p>
+      Ferme les éventuels formulaires non enregistrés avant de continuer. Une
+      connexion Internet est nécessaire.
+    </p>
+    <button id="repair">Charger la version mobile</button>
+    <div id="status" role="status">Prêt pour la mise à jour.</div>
+    <p>
+      Tu dois d’abord avoir publié tous les fichiers du correctif sur GitHub
+      Pages.
+    </p>
+  </main>
+  <script>
+    const button = document.getElementById("repair"),
+      status = document.getElementById("status");
+    function activated(worker) {
+      return new Promise((resolve, reject) => {
+        if (worker.state === "activated") {
+          resolve();
+          return;
+        }
+        const timer = setTimeout(
+          () =>
+            reject(
+              Error(
+                "La mise à jour prend plus de temps que prévu. Vérifie le déploiement GitHub et réessaie.",
+              ),
+            ),
+          45000,
+        );
+        worker.addEventListener("statechange", () => {
+          if (worker.state === "activated") {
+            clearTimeout(timer);
+            resolve();
+          } else if (worker.state === "redundant") {
+            clearTimeout(timer);
+            reject(
+              Error(
+                "Installation refusée. Un fichier du déploiement manque peut-être.",
+              ),
+            );
+          }
+        });
+        worker.postMessage({ type: "ACTIVATE_UPDATE" });
+      });
+    }
+    button.onclick = async () => {
+      button.disabled = true;
+      try {
+        if (!navigator.onLine)
+          throw Error(
+            "Connecte le téléphone à Internet pour charger cette version.",
+          );
+        const probe = await fetch("manifest.json?v=1.2.1", {
+          cache: "no-store",
+        });
+        if (!probe.ok)
+          throw Error(
+            "manifest.json manque encore sur GitHub Pages. Publie le correctif complet et attends la fin du déploiement.",
+          );
+        const swProbe = await fetch("sw.js?controle=1.2.1", {
+          cache: "no-store",
+        });
+        if (
+          !swProbe.ok ||
+          !(await swProbe.text()).includes("ma-cave-mobile-v1.2.1")
+        )
+          throw Error(
+            "Le nouveau sw.js n’est pas encore publié. Attends la fin du déploiement.",
+          );
+        if (!("serviceWorker" in navigator)) {
+          location.replace("index.html?v=1.2.1");
+          return;
+        }
+        status.textContent =
+          "Téléchargement et installation de la version mobile…";
+        const registration = await navigator.serviceWorker.register("sw.js", {
+          updateViaCache: "none",
+        });
+        await registration.update();
+        let worker = registration.waiting || registration.installing;
+        if (!worker && registration.active) {
+          await activated(registration.active);
+        } else if (worker) {
+          await activated(worker);
+        } else
+          throw Error("Aucune version prête. Réessaie après le déploiement.");
+        status.textContent = "Version mobile activée. Ouverture de ta cave…";
+        location.replace("index.html?v=1.2.1");
+      } catch (error) {
+        status.textContent = error.message;
+        button.disabled = false;
+      }
+    };
+  </script>
+</html>
