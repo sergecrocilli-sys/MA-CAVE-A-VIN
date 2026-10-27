@@ -1,0 +1,16 @@
+MA CAVE V1.2 MOBILE
+
+Sans compte, sans configuration Microsoft, sans synchronisation.
+
+1. Remplace les fichiers du dépôt GitHub Pages par le CONTENU de MA_CAVE_V1.
+2. Supprime les anciens fichiers propres à OneDrive : config.js, js/onedrive.js, vendor/ et CONFIGURATION_ONEDRIVE.md si présents. Ne supprime pas les données du navigateur.
+3. Ouvre l’adresse HTTPS dans Safari sur iPhone (ou Chrome sur Android).
+4. Si l’écran Microsoft reste affiché, ferme complètement tous les onglets Ma Cave et l’application installée, puis rouvre après quelques instants pour activer le nouveau cache. Ne vide pas les données du site.
+5. Sur iPhone : Partager > Sur l’écran d’accueil. Ouvre ensuite cette icône et commence ta cave.
+6. Ajouter un vin > Prendre une photo OU Choisir une image > Enregistrer.
+7. Dans Paramètres, exporte régulièrement la sauvegarde JSON (photos incluses) et conserve-la ailleurs.
+
+100 références maximum ; les quantités peuvent dépasser 100 bouteilles.
+La cave appartient au stockage de cet appareil/navigateur. Aucun transfert automatique vers un autre téléphone ou ordinateur. Safari et une version installée peuvent utiliser des stockages distincts : adopte un point d’entrée et transfère par JSON si nécessaire.
+
+Lire README.pdf.

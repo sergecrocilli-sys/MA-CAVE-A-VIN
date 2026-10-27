@@ -1,0 +1,27 @@
+MA CAVE V1.2 MOBILE — VERIFICATION DU 27/10/2026
+
+Base : ma_cave_V1(3).zip fourni, version locale V1. Aucun code OneDrive repris.
+
+Contrôles réalisés dans Chrome avec une base IndexedDB de test séparée :
+- ouverture directe sur le tableau de bord sans compte ;
+- sélection d'une image et affichage de l'aperçu ;
+- présence d'un second contrôle photo avec capture=environment ;
+- saisie d'un vin de 12 bouteilles avec une image PNG générée pour le test ;
+- conversion en JPEG, limite de 1200 pixels et objectif inférieur à 345 Ko ;
+- fiche et photo retrouvées après réouverture de la base IndexedDB ;
+- mouvement conduisant à un stock négatif refusé sans changement des données ;
+- enregistrement de 101 références refusé sans écraser la cave existante ;
+- sérialisation JSON, validation et restauration de la photo ;
+- deux mouvements rapprochés enregistrés atomiquement, stock final de 10 ;
+- contrôle visuel accueil et formulaire à une largeur de 390 pixels ;
+- contrôle visuel du guide PDF et vérification des chemins de ressources.
+
+Les pages de test, images factices et bases de test ne sont pas livrées dans le ZIP.
+
+Restent à essayer sur le téléphone physique : ouverture de la caméra iPhone,
+permissions et choix du sélecteur iOS, conversion HEIC selon navigateur, installation
+PWA sur l'adresse HTTPS réelle, mise en cache hors ligne et enregistrement effectif
+à l'emplacement choisi dans Fichiers pour un export JSON.
+
+Il n'y a ni compte, ni synchronisation ni stockage distant. Le contrôle du champ
+capture indique au système la caméra souhaitée ; le comportement exact dépend du téléphone.
