@@ -1,0 +1,1 @@
+Les fiches et photos sont enregistrées dans le dossier de l’application sur le OneDrive personnel connecté. Un cache IndexedDB isolé par compte sert à la consultation hors connexion. Aucun fichier utilisateur à déposer dans GitHub.
